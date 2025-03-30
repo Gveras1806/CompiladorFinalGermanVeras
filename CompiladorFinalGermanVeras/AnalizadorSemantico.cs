@@ -138,12 +138,76 @@ namespace CompiladorFinalGermanVeras
 
         public void Visitar(NodoOperacion nodo)
         {
-            throw new NotImplementedException();
+            // Evaluamos los tipos de los operandos izquierdo y derecho
+            string tipoIzquierda = EvaluarTipo(nodo.Izquierda);
+            string tipoDerecha = EvaluarTipo(nodo.Derecha);
+
+            // Verificamos si los operandos son compatibles
+            if (tipoIzquierda != tipoDerecha)
+            {
+                Errores.Add($"Error semántico: Los operandos de la operación no son compatibles. '{tipoIzquierda}' y '{tipoDerecha}'.");
+            }
+            else
+            {
+                nodo.Tipo = tipoIzquierda;  // El tipo de la operación será el mismo de los operandos
+            }
         }
 
         public void Visitar(NodoBloque nodo)
         {
-            throw new NotImplementedException();
+            // Visitamos todas las sentencias dentro del bloque
+            foreach (var sentencia in nodo.Sentencias)
+            {
+                sentencia.Aceptar(this); // Recursión: visita cada sentencia
+            }
         }
+
+        public void Visitar(NodoWhile nodo)
+        {// Evaluamos la condición del ciclo
+            if (nodo.Condicion != null)
+            {
+                nodo.Condicion.Aceptar(this);
+                string tipoCondicion = EvaluarTipo(nodo.Condicion);
+                if (tipoCondicion != "bool")
+                {
+                    Errores.Add($"Error semántico: La condición de 'while' debe ser de tipo 'bool', pero se obtuvo '{tipoCondicion}'.");
+                }
+            }
+
+            // Evaluamos el cuerpo del ciclo
+            if (nodo.Cuerpo != null)
+            {
+                nodo.Cuerpo.Aceptar(this);
+            }
+        }
+
+        public void Visitar(NodoFor nodo)
+        {
+            // Evaluamos la inicialización
+            if (nodo.Inicializacion != null)
+                nodo.Inicializacion.Aceptar(this);
+
+            // Evaluamos la condición
+            if (nodo.Condicion != null)
+            {
+                nodo.Condicion.Aceptar(this);
+                string tipoCondicion = EvaluarTipo(nodo.Condicion);
+                if (tipoCondicion != "bool")
+                {
+                    Errores.Add($"Error semántico: La condición de 'for' debe ser de tipo 'bool', pero se obtuvo '{tipoCondicion}'.");
+                }
+            }
+
+            // Evaluamos el incremento
+            if (nodo.Incremento != null)
+                nodo.Incremento.Aceptar(this);
+
+            // Evaluamos el cuerpo del ciclo
+            if (nodo.Cuerpo != null)
+            {
+                nodo.Cuerpo.Aceptar(this);
+            }
+        }
+
     }
 }

@@ -109,14 +109,14 @@ namespace CompiladorFinalGermanVeras
             OptimizadorCodigoIntermedio optimizador = new OptimizadorCodigoIntermedio();
             List<string> codigoOpt = optimizador.Optimizar(generador.CodigoIntermedio);
 
-            StringBuilder Codint = new StringBuilder();
-            Codint.AppendLine("═════════════════════════════════");
-            Codint.AppendLine("      Optimizacion de Código ");
-            Codint.AppendLine("═════════════════════════════════");
-            foreach (var item in codigoOpt)
-            {
-                Codint.AppendLine($"→ {item}");
-            }
+            //StringBuilder Codint = new StringBuilder();
+            //Codint.AppendLine("═════════════════════════════════");
+            //Codint.AppendLine("      Optimizacion de Código ");
+            //Codint.AppendLine("═════════════════════════════════");
+            //foreach (var item in codigoOpt)
+            //{
+            //    Codint.AppendLine($"→ {item}");
+            //}
 
             GeneradorCodigoCpp generadorCpp = new GeneradorCodigoCpp();
             string codigoCpp = generadorCpp.GenerarCodigoCpp(codigoOpt);
@@ -152,17 +152,22 @@ namespace CompiladorFinalGermanVeras
                 cin.AppendLine("→ No hay resultado o no se realizó ninguna operación.");
             }
 
-            codinter.Text = Codint.ToString();
+            //codinter.Text = Codint.ToString();
             sal.Text = cin.ToString();
 
 
-            codinter.Text = Codint.ToString();
+            //codinter.Text = Codint.ToString();
             sal.Text = cin.ToString();
 
         }
 
-
-
+        private void button1_Click(object sender, EventArgs e)
+        {
+            entrada.Clear();
+            errores.Clear();
+            salida.Clear();
+            sal.Clear();
+        }
     }
 }
 

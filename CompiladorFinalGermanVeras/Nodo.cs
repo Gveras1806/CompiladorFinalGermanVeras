@@ -19,8 +19,22 @@ namespace CompiladorFinalGermanVeras
         void Visitar(NodoAsignacion nodo);
         void Visitar(NodoOperacion nodo);
         void Visitar(NodoBloque nodo);
+        void Visitar(NodoWhile nodo);
+        void Visitar(NodoFor nodo);
     }
 
+    public class NodoFor : Nodo
+    {
+        public Nodo Inicializacion { get; set; }
+        public NodoExpresion Condicion { get; set; }
+        public Nodo Incremento { get; set; }
+        public Nodo Cuerpo { get; set; }
+
+        public override void Aceptar(IVisitorSemantico visitor)
+        {
+            visitor.Visitar(this);
+        }
+    }
     // Nodo para la sentencia "using"
     public class NodoUsing : Nodo
     {
@@ -34,8 +48,18 @@ namespace CompiladorFinalGermanVeras
             visitor.Visitar(this);
         }
     }
- 
 
+    public class NodoWhile : Nodo
+    {
+        public NodoExpresion Condicion { get; set; }
+        public Nodo Cuerpo { get; set; }
+
+        public override void Aceptar(IVisitorSemantico visitor)
+        {
+            // Si tienes un método específico para NodoWhile en el visitor, agrégalo aquí
+            // visitor.Visitar(this);
+        }
+    }
     // Nodo para la sentencia "if"
     public class NodoIf : Nodo
     {
@@ -69,6 +93,8 @@ namespace CompiladorFinalGermanVeras
     // Nodo para declaraciones de variables
     public class NodoDeclaracion : Nodo
     {
+        internal NodoExpresion Expresion;
+
         public string Tipo { get; set; }
         public string Identificador { get; set; }
 
@@ -117,7 +143,7 @@ namespace CompiladorFinalGermanVeras
             visitor.Visitar(this);
         }
     }
-
+    
 
 
     // Nodo para bloques de código (Lista de sentencias)

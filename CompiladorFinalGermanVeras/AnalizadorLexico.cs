@@ -176,7 +176,7 @@ namespace CompiladorFinalGermanVeras
             }
 
             // Manejo de operadores relacionales y lógicos
-            if ("=!<>|&".Contains(actual))
+            if ("=!<>|&+-*/".Contains(actual))
             {
                 int colInicio = columna;
                 string operador = actual.ToString();
@@ -194,7 +194,6 @@ namespace CompiladorFinalGermanVeras
                 columna++;
                 return new Token { Tipo = TokenType.Operador, Valor = operador, Linea = linea, Columna = colInicio };
             }
-
             // Manejo de delimitadores y otros símbolos
             int colToken = columna;
             switch (actual)

@@ -69,9 +69,37 @@ namespace CompiladorFinalGermanVeras
                 SentenciaElse = sentenciaElse
             };
         }
+
+        private NodoWhile ParseWhile()
+        {
+            Consume(TokenType.PalabraReservada, "while");
+            Consume(TokenType.Delimitador, "(");
+            NodoExpresion condicion = ParseExpresion();
+            Consume(TokenType.Delimitador, ")");
+            Nodo cuerpo = ParseSentencia();
+
+            return new NodoWhile { Condicion = condicion, Cuerpo = cuerpo };
+        }
+
+        private NodoFor ParseFor()
+        {
+            Consume(TokenType.PalabraReservada, "for");
+            Consume(TokenType.Delimitador, "(");
+            Nodo inicializacion = ParseStatement();
+            NodoExpresion condicion = ParseExpresion();
+            Consume(TokenType.Delimitador, ";");
+            Nodo incremento = ParseStatement();
+            Consume(TokenType.Delimitador, ")");
+            Nodo cuerpo = ParseSentencia();
+
+            return new NodoFor { Inicializacion = inicializacion, Condicion = condicion, Incremento = incremento, Cuerpo = cuerpo };
+        }
+
         // Método para analizar una sentencia
         private Nodo ParseSentencia()
         {
+            if (Match(TokenType.PalabraReservada, "while")) return ParseWhile();
+            if (Match(TokenType.PalabraReservada, "for")) return ParseFor();
             if (Match(TokenType.PalabraReservada, "if"))
             {
                 return ParseIf();
@@ -83,6 +111,20 @@ namespace CompiladorFinalGermanVeras
 
             // Añadir más casos según las sentencias que tu compilador necesite soportar (while, for, etc.)
             throw new Exception("Sentencia no reconocida.");
+            if (Match(TokenType.Delimitador, "{")) return ParseBloque();
+        }
+        private NodoBloque ParseBloque()
+        {
+            Consume(TokenType.Delimitador, "{");
+            List<Nodo> sentencias = new List<Nodo>();
+
+            while (!Match(TokenType.Delimitador, "}"))
+            {
+                sentencias.Add(ParseSentencia());
+            }
+            Consume(TokenType.Delimitador, "}");
+
+            return new NodoBloque { Sentencias = sentencias };
         }
 
         public Nodo ParseReturn()
@@ -121,52 +163,69 @@ namespace CompiladorFinalGermanVeras
                 return token.Tipo == TokenType.PalabraReservada && (token.Valor == "int" || token.Valor == "string" || token.Valor == "decimal" || token.Valor == "DateTime");
             }
 
-            // Analiza una declaración de variable: por ejemplo, "int x;"
-            private NodoDeclaracion ParseDeclaracion()
+        // Analiza una declaración de variable: por ejemplo, "int x;"
+        private NodoDeclaracion ParseDeclaracion()
+        {
+            // Primero, obtenemos el tipo de la variable (ej: "int")
+            string tipo = tokens[currentIndex].Valor;
+            Consume(TokenType.PalabraReservada); // Consume el tipo, por ejemplo "int"
+
+            // Luego, consumimos el identificador (nombre de la variable)
+            string identificador = tokens[currentIndex].Valor;
+            Consume(TokenType.Identificador);  // Consume el identificador, por ejemplo "x"
+
+            NodoExpresion expresionDerecha = null;
+
+            // Verificamos si hay una asignación (es decir, si hay un '=' después de la variable)
+            if (Match(TokenType.Operador, "="))
             {
-                // Se asume que el primer token es el tipo
-                string tipo = tokens[currentIndex].Valor;
-                Consume(TokenType.PalabraReservada); // consume el tipo
-                                                     // Se espera un identificador
-                string identificador = tokens[currentIndex].Valor;
-                Consume(TokenType.Identificador);
+                // Consumimos el signo igual
+                Consume(TokenType.Operador, "=");
 
-                // Almacena la variable en el diccionario
-                variables[identificador] = tipo;
-
-                // Se espera el delimitador ";" al final
-                Consume(TokenType.Delimitador, ";");
-
-                return new NodoDeclaracion { Tipo = tipo, Identificador = identificador };
+                // Analizamos la expresión a la derecha del signo igual (por ejemplo, "1+1")
+                expresionDerecha = ParseExpresion();
             }
 
-            // Analiza una asignación: por ejemplo, "x = 5;"
-            private NodoAsignacion ParseAsignacion()
+            // Finalmente, esperamos el delimitador ";"
+            Consume(TokenType.Delimitador, ";");
+
+            // Devolvemos el nodo de declaración con la expresión si es necesario
+            return new NodoDeclaracion
             {
-                string identificador = tokens[currentIndex].Valor;
-                Consume(TokenType.Identificador);  // Consume el identificador (x)
-                Consume(TokenType.Operador, "=");  // Consume el operador "="
+                Tipo = tipo,
+                Identificador = identificador,
+                Expresion = expresionDerecha
+            };
+        }
 
-                // Aquí analizamos la expresión del lado derecho de la asignación
-                NodoExpresion expresionDerecha = ParseExpresion();
 
-                // Almacena la asignación
-                Consume(TokenType.Delimitador, ";");
+        // Analiza una asignación: por ejemplo, "x = 5;"
+        private NodoAsignacion ParseAsignacion()
+            {
+            string identificador = tokens[currentIndex].Valor;
+            Consume(TokenType.Identificador);  // Consume el identificador (x)
+            Consume(TokenType.Operador, "=");  // Consume el operador "="
 
-                return new NodoAsignacion { Identificador = identificador, Expresion = expresionDerecha };
-            }
+            // Aquí analizamos la expresión del lado derecho de la asignación
+            NodoExpresion expresionDerecha = ParseExpresion();  // Asegúrate de que ParseExpresion está trabajando correctamente
+
+            // Almacena la asignación
+            Consume(TokenType.Delimitador, ";");
+
+            return new NodoAsignacion { Identificador = identificador, Expresion = expresionDerecha };
+        }
 
         // Analiza una expresión con operadores, como 0 + 1 o 2 * 3
         // Método ParseExpresion
         private NodoExpresion ParseExpresion()
         {
-            NodoExpresion izquierda = ParseTermino();  // Asegurándonos que este es NodoExpresion
+            NodoExpresion izquierda = ParseTermino();
 
-            // Procesar operadores '+' o '-'
+            // Primero, manejamos los operadores aritméticos
             while (Match(TokenType.Operador, "+") || Match(TokenType.Operador, "-"))
             {
                 string operador = tokens[currentIndex].Valor;
-                Advance();
+                Advance();  // Avanzamos al siguiente token (el operador)
                 NodoExpresion derecha = ParseTermino();
                 izquierda = new NodoOperacion
                 {
@@ -176,7 +235,21 @@ namespace CompiladorFinalGermanVeras
                 };
             }
 
-            return izquierda;  // Retorna el NodoExpresion
+            // Luego, manejamos los operadores lógicos
+            while (Match(TokenType.Operador, "&&") || Match(TokenType.Operador, "||"))
+            {
+                string operador = tokens[currentIndex].Valor;
+                Advance();  // Avanzamos al siguiente token (el operador)
+                NodoExpresion derecha = ParseTermino();
+                izquierda = new NodoOperacion
+                {
+                    Operador = operador,
+                    Izquierda = izquierda,
+                    Derecha = derecha
+                };
+            }
+
+            return izquierda;
         }
 
         // Método ParseTermino
@@ -238,9 +311,6 @@ namespace CompiladorFinalGermanVeras
             return null;
         }
 
-
-
-
         // Métodos auxiliares de consumo y avance de tokens
         private Token Consume(TokenType type, string value = null)
             {
@@ -275,7 +345,10 @@ namespace CompiladorFinalGermanVeras
                 nodoIf.Sino = ParseStatement();
             }
 
+
+
             return nodoIf;
+
         }
 
         private Token Advance()

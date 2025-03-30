@@ -100,12 +100,75 @@ namespace CompiladorFinalGermanVeras
 
         public void Visitar(NodoOperacion nodo)
         {
-            throw new NotImplementedException();
+
+            string tempIzquierda = EvaluarExpresion(nodo.Izquierda);
+            string tempDerecha = EvaluarExpresion(nodo.Derecha);
+            string resultado = NuevoTemporal();
+
+            // Generamos la instrucción para la operación
+            string operador = nodo.Operador;
+            CodigoIntermedio.Add($"{resultado} = {tempIzquierda} {operador} {tempDerecha}");
+
+            // Asignamos el resultado de la operación al temporal
+            nodo.Tipo = "int";  // Esto puede depender del tipo de los operandos
         }
 
         public void Visitar(NodoBloque nodo)
         {
-            throw new NotImplementedException();
+            // Visitamos todas las sentencias dentro del bloque
+            foreach (var sentencia in nodo.Sentencias)
+            {
+                sentencia.Aceptar(this); // Recursión: visita cada sentencia
+            }
+        }
+
+        public void Visitar(NodoWhile nodo)
+        {
+            string etiquetaInicio = NuevaEtiqueta();
+            string etiquetaFin = NuevaEtiqueta();
+
+            CodigoIntermedio.Add($"{etiquetaInicio}:");
+
+            // Evaluamos la condición
+            string tempCond = EvaluarExpresion(nodo.Condicion);
+            CodigoIntermedio.Add($"IF_FALSE {tempCond} GOTO {etiquetaFin}");
+
+            // Evaluamos el cuerpo del ciclo
+            nodo.Cuerpo.Aceptar(this);
+
+            // Salto al inicio para repetir el ciclo
+            CodigoIntermedio.Add($"GOTO {etiquetaInicio}");
+
+            // Etiqueta de fin del ciclo
+            CodigoIntermedio.Add($"{etiquetaFin}:");
+        }
+
+        public void Visitar(NodoFor nodo)
+        {
+
+            string etiquetaInicio = NuevaEtiqueta();
+            string etiquetaFin = NuevaEtiqueta();
+
+            // Evaluamos la inicialización
+            nodo.Inicializacion.Aceptar(this);
+
+            CodigoIntermedio.Add($"{etiquetaInicio}:");
+
+            // Evaluamos la condición
+            string tempCond = EvaluarExpresion(nodo.Condicion);
+            CodigoIntermedio.Add($"IF_FALSE {tempCond} GOTO {etiquetaFin}");
+
+            // Evaluamos el cuerpo del ciclo
+            nodo.Cuerpo.Aceptar(this);
+
+            // Evaluamos el incremento
+            nodo.Incremento.Aceptar(this);
+
+            // Salto al inicio para repetir el ciclo
+            CodigoIntermedio.Add($"GOTO {etiquetaInicio}");
+
+            // Etiqueta de fin del ciclo
+            CodigoIntermedio.Add($"{etiquetaFin}:");
         }
     }
 }
