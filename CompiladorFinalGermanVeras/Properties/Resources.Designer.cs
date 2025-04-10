@@ -63,9 +63,69 @@ namespace CompiladorFinalGermanVeras.Properties {
         /// <summary>
         ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap bookmark_9171972__1_ {
+            get {
+                object obj = ResourceManager.GetObject("bookmark_9171972 (1)", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap cleaning_9926109__1_ {
+            get {
+                object obj = ResourceManager.GetObject("cleaning_9926109 (1)", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap cleaning_9926109__1_1 {
+            get {
+                object obj = ResourceManager.GetObject("cleaning_9926109 (1)1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap cleaning_9926109__2_ {
+            get {
+                object obj = ResourceManager.GetObject("cleaning_9926109 (2)", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap icons8_limpiar_48 {
             get {
                 object obj = ResourceManager.GetObject("icons8-limpiar-48", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap logout_9975288__1_ {
+            get {
+                object obj = ResourceManager.GetObject("logout_9975288 (1)", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Busca un recurso adaptado de tipo System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap skip_16785491 {
+            get {
+                object obj = ResourceManager.GetObject("skip_16785491", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

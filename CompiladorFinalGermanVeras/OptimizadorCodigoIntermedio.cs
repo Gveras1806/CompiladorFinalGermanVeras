@@ -86,5 +86,7 @@ namespace CompiladorFinalGermanVeras
                 return true;
             return false;
         }
+
+
     }
 }
